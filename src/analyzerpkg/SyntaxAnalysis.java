@@ -4,27 +4,27 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * ËãÊõ±í´ïÊ½Óï·¨·ÖÎöÆ÷
- * @author ÔøÔ£ÎÄ
+ * ç®—æœ¯è¡¨è¾¾å¼è¯­æ³•åˆ†æå™¨
+ * @author æ›¾è£•æ–‡
  *
- * ÎÄ·¨ÈçÏÂ£º
- * £¨1£©E -> E + T 
- * £¨2£©E -> T
- * £¨3£©E -> E - T
- * £¨4£©T -> T * F 
- * £¨5£©T -> T / F 
- * £¨6£©T -> F 
- * £¨7£©F -> (E)
- * £¨8£©F -> i 
+ * æ–‡æ³•å¦‚ä¸‹ï¼š
+ * ï¼ˆ1ï¼‰E -> E + T 
+ * ï¼ˆ2ï¼‰E -> T
+ * ï¼ˆ3ï¼‰E -> E - T
+ * ï¼ˆ4ï¼‰T -> T * F 
+ * ï¼ˆ5ï¼‰T -> T / F 
+ * ï¼ˆ6ï¼‰T -> F 
+ * ï¼ˆ7ï¼‰F -> (E)
+ * ï¼ˆ8ï¼‰F -> i 
  */
 public class SyntaxAnalysis
 {
-	private Stack<String[]> statusStack; //SLR·ÖÎö·ÖÎö×´Ì¬Õ»
-	private int r = 100; //action±íºÍGOTO±íÖĞµÄÖµ´óÓÚ100µÄ¶¼±íÊ¾¹éÔ¼²Ù×÷£¬±ÈÈç105±íÊ¾°´ÕÕµÚ5Ìõ²úÉúÊ½½øĞĞ¹éÔ¼
-	private int s = 0; //action±íºÍGOTO±íÖĞµÄÖµĞ¡ÓÚ100µÄ¶¼±íÊ¾ÒÆ½ø²Ù×÷£¬±ÈÈç5±íÊ¾×ªÒÆµ½×´Ì¬5
-	//action±í£¬-2±íÊ¾½ÓÊÜ£¬¼´Í¨¹ıÓï·¨·ÖÎöÆ÷µÄ¼ìÑé
+	private Stack<String[]> statusStack; //SLRåˆ†æåˆ†æçŠ¶æ€æ ˆ
+	private int r = 100; //actionè¡¨å’ŒGOTOè¡¨ä¸­çš„å€¼å¤§äº100çš„éƒ½è¡¨ç¤ºå½’çº¦æ“ä½œï¼Œæ¯”å¦‚105è¡¨ç¤ºæŒ‰ç…§ç¬¬5æ¡äº§ç”Ÿå¼è¿›è¡Œå½’çº¦
+	private int s = 0; //actionè¡¨å’ŒGOTOè¡¨ä¸­çš„å€¼å°äº100çš„éƒ½è¡¨ç¤ºç§»è¿›æ“ä½œï¼Œæ¯”å¦‚5è¡¨ç¤ºè½¬ç§»åˆ°çŠ¶æ€5
+	//actionè¡¨ï¼Œ-2è¡¨ç¤ºæ¥å—ï¼Œå³é€šè¿‡è¯­æ³•åˆ†æå™¨çš„æ£€éªŒ
 	private int[][] actionTable = {
-	//ÁĞË³Ğò	  i   +   -   *   /   (   )   #
+	//åˆ—é¡ºåº	  i   +   -   *   /   (   )   #
 			{s+4, -1, -1, -1, -1,s+5, -1, -1},
 			{ -1,s+7,s+6, -1, -1, -1, -1, -2},
 			{ -1,r+2,r+2,s+9,s+8, -1,r+2,r+2},
@@ -35,16 +35,16 @@ public class SyntaxAnalysis
 			{s+4, -1, -1, -1, -1,s+5, -1, -1},
 			{s+4, -1, -1, -1, -1,s+5, -1, -1},
 			{s+4, -1, -1, -1, -1,s+5, -1, -1},
-			{ -1,s+7,s+6, -1, -1, -1,s+14,-1},
+			{ -1,s+7,s+6, -1, -1, -1,s+13,-1},
 			{ -1,r+3,r+3,s+9,s+8, -1,r+3,r+3},
 			{ -1,r+1,r+1,s+9,s+8, -1,r+1,r+1},
 			{ -1,r+7,r+7,r+7,r+7, -1,r+7,r+7},
 			{ -1,r+5,r+5,r+5,r+5, -1,r+5,r+5},
 			{ -1,r+4,r+4,r+4,r+4, -1,r+4,r+4},
 	};
-	//GOTO£¨×ª»»£©±í
+	//GOTOï¼ˆè½¬æ¢ï¼‰è¡¨
 	private int[][] gotoTable = {
-	  //ÁĞË³Ğò        E  T  F
+	  //åˆ—é¡ºåº        E  T  F
 			{ 1, 2, 3},
 			{-1,-1,-1},
 			{-1,-1,-1},
@@ -64,9 +64,9 @@ public class SyntaxAnalysis
 	};
 	
 	/**
-	 * ÒÆÈë²Ù×÷
-	 * @param status ÏÂÒ»¸ö×´Ì¬
-	 * @param symbol ±»ÒÆÈëµÄµ¥´Ê·ûºÅ
+	 * ç§»å…¥æ“ä½œ
+	 * @param status ä¸‹ä¸€ä¸ªçŠ¶æ€
+	 * @param symbol è¢«ç§»å…¥çš„å•è¯ç¬¦å·
 	 */
 	public void shiftIn(int status, String symbol)
 	{
@@ -77,13 +77,13 @@ public class SyntaxAnalysis
 	}
 	
 	/**
-	 * ¹éÔ¼²Ù×÷
-	 * @param productionNum ¹éÔ¼²úÉúÊ½µÄ±àºÅ
+	 * å½’çº¦æ“ä½œ
+	 * @param productionNum å½’çº¦äº§ç”Ÿå¼çš„ç¼–å·
 	 */
 	public void combine(int productionNum)
 	{
-		int popAmount = 0; //ĞèÒª³öÕ»µÄÔªËØ¸öÊı
-		//²úÉúÊ½1,2 ,4,5,8µÄÓÒ²¿¶¼°üº¬Èı¸öÎÄ·¨·ûºÅ,²úÉúÊ½3,6,7ÓÒ²¿Ö»°üº¬Ò»¸öÎÄ·¨·ûºÅ,¹ÊĞèÒª³öÕ»3¸öÔªËØ
+		int popAmount = 0; //éœ€è¦å‡ºæ ˆçš„å…ƒç´ ä¸ªæ•°
+		//äº§ç”Ÿå¼1,2 ,4,5,8çš„å³éƒ¨éƒ½åŒ…å«ä¸‰ä¸ªæ–‡æ³•ç¬¦å·,äº§ç”Ÿå¼3,6,7å³éƒ¨åªåŒ…å«ä¸€ä¸ªæ–‡æ³•ç¬¦å·,æ•…éœ€è¦å‡ºæ ˆ3ä¸ªå…ƒç´ 
 		if( productionNum == 1 ||
 			productionNum == 3 ||
 			productionNum == 4 ||
@@ -92,7 +92,7 @@ public class SyntaxAnalysis
 		{
 			popAmount = 3;
 		}
-		else //²úÉúÊ½3,6,7ÓÒ²¿Ö»°üº¬Ò»¸öÎÄ·¨·ûºÅ£¬¹ÊĞèÒª³öÕ»1¸öÔªËØ
+		else //äº§ç”Ÿå¼3,6,7å³éƒ¨åªåŒ…å«ä¸€ä¸ªæ–‡æ³•ç¬¦å·ï¼Œæ•…éœ€è¦å‡ºæ ˆ1ä¸ªå…ƒç´ 
 		{
 			popAmount = 1;
 		}
@@ -101,32 +101,32 @@ public class SyntaxAnalysis
 			statusStack.pop();
 		}
 		String[] topItem = statusStack.peek();
-		int status = Integer.parseInt(topItem[0]); //»ñÈ¡Õ»¶¥ÔªËØ×´Ì¬Öµ
-		String vn = ""; //´æ´¢²úÉúÊ½×ó²¿·ûºÅ
-		int vnNum = -1; //´æ´¢²úÉúÊ½×ó²¿·ûºÅµÄ±àºÅ
+		int status = Integer.parseInt(topItem[0]); //è·å–æ ˆé¡¶å…ƒç´ çŠ¶æ€å€¼
+		String vn = ""; //å­˜å‚¨äº§ç”Ÿå¼å·¦éƒ¨ç¬¦å·
+		int vnNum = -1; //å­˜å‚¨äº§ç”Ÿå¼å·¦éƒ¨ç¬¦å·çš„ç¼–å·
 		if(productionNum >=1 && productionNum <= 3)
 		{
 			vn = "E";
-			vnNum = 0; //´ú±íE
+			vnNum = 0; //ä»£è¡¨E
 		}
 		else if(productionNum >= 4 && productionNum <= 6)
 		{
 			vn = "T";
-			vnNum = 1; //´ú±íT
+			vnNum = 1; //ä»£è¡¨T
 		}
 		else
 		{
 			vn = "F";
-			vnNum = 2; //´ú±íF
+			vnNum = 2; //ä»£è¡¨F
 		}
-		int nextStatus = gotoTable[status][vnNum]; //»ñÈ¡ÏÂÒ»¸ö×´Ì¬
+		int nextStatus = gotoTable[status][vnNum]; //è·å–ä¸‹ä¸€ä¸ªçŠ¶æ€
 		this.shiftIn(nextStatus, vn);
 	}
 	
 	/**
-	 * »ñÈ¡ÖÕ½á·ûºÅÔÚaction±íÖĞµÄ±àºÅ
-	 * @param symbol ÖÕ½á·ûºÅ
-	 * @return ÖÕ½á·ûºÅÔÚaction±íÖĞµÄ±àºÅ
+	 * è·å–ç»ˆç»“ç¬¦å·åœ¨actionè¡¨ä¸­çš„ç¼–å·
+	 * @param symbol ç»ˆç»“ç¬¦å·
+	 * @return ç»ˆç»“ç¬¦å·åœ¨actionè¡¨ä¸­çš„ç¼–å·
 	 */
 	public int getSymbolNum(String symbol)
 	{
@@ -165,50 +165,50 @@ public class SyntaxAnalysis
 	}
 	
 	/**
-	 * Óï·¨·ÖÎö·½·¨
-	 * ÊäÈë´Ê·¨·ÖÎöÆ÷µÃµ½µÄµ¥´Ê·ûºÅ±í£¬Êä³ö¸Ã±íÖĞµÄµ¥´Ê·ûºÅÊÇ·ñ¹¹³ÉÕıÈ·µÄÓï·¨µÄ±êÖ¾
-	 * @param symbolTable ´Ê·¨·ÖÎöÆ÷Êä³öµÄ·ûºÅ±í
-	 * @return ÊÇ·ñ·ûºÏÓï·¨¹æÔò
+	 * è¯­æ³•åˆ†ææ–¹æ³•
+	 * è¾“å…¥è¯æ³•åˆ†æå™¨å¾—åˆ°çš„å•è¯ç¬¦å·è¡¨ï¼Œè¾“å‡ºè¯¥è¡¨ä¸­çš„å•è¯ç¬¦å·æ˜¯å¦æ„æˆæ­£ç¡®çš„è¯­æ³•çš„æ ‡å¿—
+	 * @param symbolTable è¯æ³•åˆ†æå™¨è¾“å‡ºçš„ç¬¦å·è¡¨
+	 * @return æ˜¯å¦ç¬¦åˆè¯­æ³•è§„åˆ™
 	 */
 	public boolean syntaxAnaly(List<String[]> symbolTable)
 	{
-		boolean flag = true; //Óï·¨ÕıÈ·Óë·ñµÄ±êÖ¾
+		boolean flag = true; //è¯­æ³•æ­£ç¡®ä¸å¦çš„æ ‡å¿—
 		statusStack = new Stack<String[]>();
-		this.shiftIn(0, "#"); //Ñ¹ÈëÒ»¸öÔªËØ×÷ÎªÕ»µ×
-		String[] endSymbol = new String[2]; //ÎªÓï·¨·ÖÎöÆ÷Êä³ö½á¹ûsymbolTableÄ©Î²Ìí¼ÓÒ»¸ö½áÊø·ûºÅ<#,>
+		this.shiftIn(0, "#"); //å‹å…¥ä¸€ä¸ªå…ƒç´ ä½œä¸ºæ ˆåº•
+		String[] endSymbol = new String[2]; //ä¸ºè¯­æ³•åˆ†æå™¨è¾“å‡ºç»“æœsymbolTableæœ«å°¾æ·»åŠ ä¸€ä¸ªç»“æŸç¬¦å·<#,>
 		endSymbol[0] = "#";
 		endSymbol[1] = "";
 		symbolTable.add(endSymbol);
-		int tableIdx = 0; //µ¥´Ê·ûºÅ±íµÄË÷Òı
+		int tableIdx = 0; //å•è¯ç¬¦å·è¡¨çš„ç´¢å¼•
 		while(tableIdx < symbolTable.size())
 		{
-			String symbol = symbolTable.get(tableIdx)[0]; //´æ´¢×îĞÂÊäÈëµÄµ¥´Ê·ûºÅ
+			String symbol = symbolTable.get(tableIdx)[0]; //å­˜å‚¨æœ€æ–°è¾“å…¥çš„å•è¯ç¬¦å·
 			String[] topItem = statusStack.peek();
-			int status = Integer.valueOf(topItem[0]); //»ñÈ¡Õ»¶¥ÔªËØµÄ×´Ì¬±àºÅ
-			int symbolNum = getSymbolNum(symbol); //»ñÈ¡ÖÕ½á·ûºÅÔÚaction±íÖĞµÄ±àºÅ
-			int nextStatus = actionTable[status][symbolNum]; //ÏÂÒ»×´Ì¬µÄ±àºÅ
-			if(nextStatus < 100 && nextStatus >= 0) //Ö´ĞĞÒÆÈë²Ù×÷
+			int status = Integer.valueOf(topItem[0]); //è·å–æ ˆé¡¶å…ƒç´ çš„çŠ¶æ€ç¼–å·
+			int symbolNum = getSymbolNum(symbol); //è·å–ç»ˆç»“ç¬¦å·åœ¨actionè¡¨ä¸­çš„ç¼–å·
+			int nextStatus = actionTable[status][symbolNum]; //ä¸‹ä¸€çŠ¶æ€çš„ç¼–å·
+			if(nextStatus < 100 && nextStatus >= 0) //æ‰§è¡Œç§»å…¥æ“ä½œ
 			{
 				this.shiftIn(nextStatus, symbol);
 				tableIdx++;
 			}
-			else if(nextStatus > 100) //Ö´ĞĞ¹éÔ¼²Ù×÷
+			else if(nextStatus > 100) //æ‰§è¡Œå½’çº¦æ“ä½œ
 			{
 				int productionNum = nextStatus - 100;
 				this.combine(productionNum);
 			}
-			else if(nextStatus == -2) //Ö´ĞĞ½ÓÊÜ²Ù×÷
+			else if(nextStatus == -2) //æ‰§è¡Œæ¥å—æ“ä½œ
 			{
 				flag = true;
 				break;
 			}
-			else //±¨´í´¦Àí
+			else //æŠ¥é”™å¤„ç†
 			{
 				flag = false;
 				break;
 			}
 		}
-		symbolTable.remove(symbolTable.size() - 1); //È¥³ı¡±#¡°
+		symbolTable.remove(symbolTable.size() - 1); //å»é™¤â€#â€œ
 		return flag;
 	}
 }
